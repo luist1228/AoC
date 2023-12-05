@@ -1,7 +1,5 @@
 package main
 
-
-
 import (
 	"fmt"
 	"log"
@@ -25,39 +23,48 @@ func main() {
 		log.Fatalf("readLines: %s", err)
 	}
 
-	colorConfig := map[string]int{
-		"blue":  14,
-		"green": 13,
-		"red":   12,
-	}
-
 	sum := 0
 
 	for i, line := range lines {
 		id := i + 1
 		game := strings.Split(line, fmt.Sprintf("Game %d:", id))
 		hands := strings.Split(game[1], ";")
-		pass := true
+
+		colorsMin := map[string]int{
+			"blue":  0,
+			"green": 0,
+			"red":   0,
+		}
 		for _, hand := range hands {
 			cubes := strings.Split(hand, ",")
 			for _, cube := range cubes {
-				for color, configuration := range colorConfig {
-					if strings.Contains(cube, color) && pass {
-						pass = checkIfValidCubes(cube, configuration)
+				for color, min := range colorsMin {
+					if strings.Contains(cube, color) {
+						colorsMin[color] = checkMinCubes(cube, min)
 					}
 				}
 			}
 		}
-		if pass {
-			sum = sum + id
+		mult := 1
+		for _, min := range colorsMin {
+			mult = mult * min
 		}
-		pass = true
+		if mult > 0 {
+			sum = sum + mult
+		}
+
 	}
 	println(sum)
+
 }
 
-func checkIfValidCubes(cubes string, max int) bool {
+func checkMinCubes(cubes string, max int) int {
 	numberString := re.FindAllString(cubes, -1)[0]
 	number, _ := strconv.Atoi(numberString)
-	return number <= max
+
+	if number > max {
+		return number
+	}
+
+	return max
 }
