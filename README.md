@@ -9,3 +9,4 @@ As an added challenge each year I will use a different language, some of these w
 The year of GO, this year I'm learning golang!!!
 
 - DAY 1 [[CHALLENGE](./days/day_1/challenge.md) / [SOLUTIONS](./days/day_1/solution.go)]
+- DAY 2 [[CHALLENGE](./days/day_2/challenge.md) / [SOLUTIONS](./days/day_2/solution.go)]

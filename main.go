@@ -1,28 +1,21 @@
 package main
 
+
+
 import (
 	"fmt"
 	"log"
+	"regexp"
+	"strconv"
 	"strings"
-	"unicode"
 
 	"github.com/luist1228/AoC/utils"
 )
 
-func checkStringContainsDigit(s string) (int, bool) {
-	digits := []string{"cero", "one", "two", "three", "four", "five", "six", "seven", "eight", "nine"}
-
-	for i, digit := range digits {
-		if strings.Contains(s, digit) {
-			return i, true
-		}
-	}
-	return 0, false
-
-}
+var re = regexp.MustCompile("[0-9]+")
 
 func main() {
-	day := "day_1"
+	day := "day_2"
 	fileName := "/input_1"
 	path := "./days/" + day + fileName + ".txt"
 
@@ -32,28 +25,39 @@ func main() {
 		log.Fatalf("readLines: %s", err)
 	}
 
+	colorConfig := map[string]int{
+		"blue":  14,
+		"green": 13,
+		"red":   12,
+	}
+
 	sum := 0
-	for _, line := range lines {
-		numbers := make([]int, 0)
-		auxString := ""
-		for _, char := range line {
-			if unicode.IsDigit(char) {
-				numbers = append(numbers, int(char-'0'))
-				auxString = ""
-			}
-			auxString = auxString + string(char)
-			digit, found := checkStringContainsDigit(auxString)
-			if found {
-				numbers = append(numbers, digit)
-				auxString = auxString[len(auxString)-2:]
+
+	for i, line := range lines {
+		id := i + 1
+		game := strings.Split(line, fmt.Sprintf("Game %d:", id))
+		hands := strings.Split(game[1], ";")
+		pass := true
+		for _, hand := range hands {
+			cubes := strings.Split(hand, ",")
+			for _, cube := range cubes {
+				for color, configuration := range colorConfig {
+					if strings.Contains(cube, color) && pass {
+						pass = checkIfValidCubes(cube, configuration)
+					}
+				}
 			}
 		}
-		first := numbers[0]
-		last := numbers[len(numbers)-1]
-		result := (first * 10) + last
-		sum = sum + result
+		if pass {
+			sum = sum + id
+		}
+		pass = true
 	}
-	fmt.Println(len(lines))
-	fmt.Println(sum)
+	println(sum)
 }
 
+func checkIfValidCubes(cubes string, max int) bool {
+	numberString := re.FindAllString(cubes, -1)[0]
+	number, _ := strconv.Atoi(numberString)
+	return number <= max
+}
