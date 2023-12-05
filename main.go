@@ -3,9 +3,23 @@ package main
 import (
 	"fmt"
 	"log"
+	"strings"
+	"unicode"
 
 	"github.com/luist1228/AoC/utils"
 )
+
+func checkStringContainsDigit(s string) (int, bool) {
+	digits := []string{"cero", "one", "two", "three", "four", "five", "six", "seven", "eight", "nine"}
+
+	for i, digit := range digits {
+		if strings.Contains(s, digit) {
+			return i, true
+		}
+	}
+	return 0, false
+
+}
 
 func main() {
 	day := "day_1"
@@ -19,9 +33,21 @@ func main() {
 	}
 
 	sum := 0
-
 	for _, line := range lines {
-		numbers := utils.LineToNumberSlice(line)
+		numbers := make([]int, 0)
+		auxString := ""
+		for _, char := range line {
+			if unicode.IsDigit(char) {
+				numbers = append(numbers, int(char-'0'))
+				auxString = ""
+			}
+			auxString = auxString + string(char)
+			digit, found := checkStringContainsDigit(auxString)
+			if found {
+				numbers = append(numbers, digit)
+				auxString = auxString[len(auxString)-2:]
+			}
+		}
 		first := numbers[0]
 		last := numbers[len(numbers)-1]
 		result := (first * 10) + last
@@ -30,3 +56,4 @@ func main() {
 	fmt.Println(len(lines))
 	fmt.Println(sum)
 }
+
